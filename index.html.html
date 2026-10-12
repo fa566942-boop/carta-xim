@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Una carta para ti 💌</title>
+    <style>
+        /* Estilos Generales */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #ffeef2; /* Fondo rosa pastel */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Contenedor del Sobre */
+        .envelope-wrapper {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            background-color: #e06376; /* Fondo interior del sobre */
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Tapa superior (Solapa) que se abre hacia arriba */
+        .flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 110px solid #f0788a; /* Color de la solapa cerrada */
+            transform-origin: top;
+            transition: transform 0.4s ease-in-out, z-index 0.4s;
+            z-index: 5; /* Al inicio cubre la carta */
+        }
+
+        /* Partes laterales e inferior del sobre (Frontal) */
+        .pocket {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+            z-index: 4; /* Se mantiene por encima de la carta al subir */
+        }
+
+        /* Cara frontal armada con trazados planos para evitar fugas visuales */
+        .pocket::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid #f3aa9c;
+            border-right: 150px solid transparent;
+            border-top: 100px solid transparent;
+            border-bottom: 100px solid #f3aa9c;
+            border-bottom-left-radius: 6px;
+        }
+
+        .pocket::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 0;
+            height: 0;
+            border-left: transparent;
+            border-right: 150px solid #f3aa9c;
+            border-top: 100px solid transparent;
+            border-bottom: 100px solid #f3aa9c;
+            border-bottom-right-radius: 6px;
+        }
+
+        /* Base interna del frente */
+        .pocket-front {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-bottom: 110px solid #f48c9c;
+            z-index: 4;
+        }
+
+        /* La Carta (Papel oculto que sube) */
+        .letter {
+            position: absolute;
+            background-color: #ffffff;
+            width: 270px;
+            height: 180px;
+            top: 10px;
+            left: 15px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.6s ease-in-out, z-index 0.6s;
+            z-index: 2; /* Oculta detrás de las tapas frontales */
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Texto dentro de la carta */
+        .letter-tag {
+            position: absolute;
+            top: 12px;
+            left: 15px;
+            font-size: 11px;
+            background: #ffe3e8;
+            color: #d6475d;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .letter-text {
+            font-family: 'Georgia', serif;
+            font-style: italic;
+            font-size: 15px;
+            color: #444;
+            line-height: 1.6;
+            margin-top: 15px;
+        }
+
+        /* --- CONTROL DE LA ANIMACIÓN --- */
+        
+        /* 1. La solapa gira hacia arriba */
+        .envelope-wrapper.open .flap {
+            transform: rotateX(180deg);
+            border-top-color: #e06376; /* Cambia de tono al voltearse */
+            z-index: 1; /* Pasa atrás para dejar salir la carta */
+        }
+
+        /* 2. La carta emerge limpiamente por la parte superior */
+        .envelope-wrapper.open .letter {
+            transform: translateY(-130px);
+            z-index: 6; /* Se coloca por encima de todo el sobre */
+        }
+
+        /* Contenedor de Botones */
+        .button-container {
+            margin-top: 160px; /* Margen amplio para que la carta no tape los botones */
+            display: flex;
+            gap: 20px;
+            z-index: 10;
+        }
+
+        button {
+            background-color: #ffffff;
+            border: 2px solid #f0788a;
+            color: #f0788a;
+            padding: 8px 25px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        button:hover {
+            background-color: #f0788a;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Estructura corregida del Sobre -->
+    <div class="envelope-wrapper" id="envelope">
+        <div class="flap"></div>
+        <div class="pocket">
+            <div class="pocket-front"></div>
+        </div>
+        
+        <!-- La Carta que se desplaza de manera vertical -->
+        <div class="letter">
+            <div class="letter-tag">Para: Ximena ✨</div>
+            <div class="letter-text">
+                Querida xim,<br>
+                eres increíblemente hermosa.<br>
+                Cada vez que te veo,<br>
+                mi mundo se detiene. 🤍
+            </div>
+        </div>
+    </div>
+
+    <!-- Botones de Control -->
+    <div class="button-container">
+        <button onclick="openEnvelope()">OPEN</button>
+        <button onclick="closeEnvelope()">CLOSE</button>
+    </div>
+
+    <script>
+        const envelope = document.getElementById('envelope');
+
+        function openEnvelope() {
+            envelope.classList.add('open');
+        }
+
+        function closeEnvelope() {
+            envelope.classList.remove('open');
+        }
+    </script>
+
+</body>
+</html>
